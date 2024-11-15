@@ -1,0 +1,40 @@
+name: 'Create Package'
+description: 'Creates a DBmaestro package '
+inputs:
+  package_name:
+    description: 'Package Name'
+    required: True
+  packages_path:
+    description: 'Local path where package files are located'
+    default: '.'
+  project_id:
+    description: 'DOP Project Name'
+    default: ''
+  env_name:
+    description: 'Environment Name'
+    default: 'Release Source'
+  server:
+    description: 'Admin Server location'
+    default: ''
+  user_name:
+    description: 'User Name'
+    default: ''
+  password:
+    description: 'Password'
+    default: ''
+  jar_path:
+    description: 'Jar Path'
+    default: './DBmaestroAgent.jar'
+ 
+runs:
+  using: "composite"
+  steps:
+    - name: Create Manifest and Package
+      shell: bash
+      run: |
+            PACKAGE_PATH="${{ inputs.packages_path }}${{ inputs.package_name }}/" 
+            echo "Package Path $PACKAGE_PATH"
+            java -jar "${{ inputs.jar_path }}" -CreateManifestFile -PathToScriptsFolder "$PACKAGE_PATH" 
+            ZIP_PATH="${{ inputs.packages_path }}${{ inputs.package_name }}.tar" 
+            tar -cvf "$ZIP_PATH" -C "${{ inputs.packages_path }}" ${{ inputs.package_name }}
+            java -jar "${{ inputs.jar_path }}" -Package -ProjectName "${{ inputs.project_id }}" -IgnoreScriptWarnings True -FilePath "$ZIP_PATH" -Server "${{ inputs.server }}" -UseSSL False -AuthType DBmaestroAccount -UserName "${{ inputs.user_name }}" -Password "${{ inputs.password }}"

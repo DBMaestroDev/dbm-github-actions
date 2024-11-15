@@ -1,0 +1,22 @@
+
+name: 'DBMaestro Jar Checkout Action'
+description: 'Checkouts DBmaestroAgent.jar with a specific version'
+inputs:
+  version:  
+    description: 'version to checkout'
+    required: true
+  target_path:
+    description: 'Path where dbm-agent-jar folder will be created'
+    required: True
+    default: '.'
+
+ 
+runs:
+  using: "composite"
+  steps: 
+  - name: Checkout repository 
+    uses: actions/checkout@v2 
+    with: 
+      repository: DBMaestroDev/dbm_jar
+      path: ${{inputs.target_path}}
+      ref: refs/tags/${{inputs.version}}
